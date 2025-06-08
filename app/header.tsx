@@ -1,8 +1,25 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ThemeToggle } from "./theme-toggle";
 import { Logo } from "./logo";
 import Link from "next/link";
 
 export function Header() {
+  const router = useRouter();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+      setShowSearch(false);
+    }
+  };
+
   return (
     <header className="flex mb-5 md:mb-10 items-center">
       <Logo />
@@ -16,35 +33,58 @@ export function Header() {
         >
           About
         </Link>
-        <a
-          href="https://twitter.com/rauchg"
-          target="_blank"
+        
+        {/* Search toggle button */}
+        <button
+          onClick={() => setShowSearch(!showSearch)}
           className="inline-flex hover:bg-gray-200 dark:hover:bg-[#313131] active:bg-gray-300 dark:active:bg-[#242424] items-center p-2 rounded-sm transition-[background-color] whitespace-nowrap -mr-2"
+          aria-label="Search"
         >
-          <TweetIcon style={{ marginRight: 4 }} /> Follow{" "}
-          <span className="hidden md:inline">&nbsp;me</span>
-        </a>
+          <SearchIcon />
+        </button>
+        
+        {/* Search input field */}
+        {showSearch && (
+          <form 
+            onSubmit={handleSearch}
+            className="absolute top-16 right-4 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-md shadow-lg z-10"
+          >
+            <div className="flex items-center px-2 py-1">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search posts..."
+                autoFocus
+                className="bg-transparent outline-none px-2 py-1 text-sm w-40 md:w-56"
+              />
+              <button 
+                type="submit"
+                className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                <SearchIcon />
+              </button>
+            </div>
+          </form>
+        )}
       </nav>
     </header>
   );
 }
 
-function TweetIcon(props: any) {
+function SearchIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width={16}
       height={16}
       viewBox="0 0 24 24"
-      {...props}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
     >
-      <path
-        fill="currentColor"
-        fillRule="nonzero"
-        stroke="none"
-        strokeWidth={1}
-        d="M8.28 20.26c7.55 0 11.68-6.26 11.68-11.67v-.53c.8-.58 1.49-1.3 2.04-2.13-.74.33-1.53.54-2.36.65.85-.5 1.5-1.32 1.8-2.28-.78.48-1.66.81-2.6 1a4.1 4.1 0 0 0-7 3.74c-3.4-.17-6.43-1.8-8.46-4.29a4.1 4.1 0 0 0 1.28 5.48c-.68-.02-1.3-.2-1.86-.5v.05a4.11 4.11 0 0 0 3.29 4.02 4 4 0 0 1-1.85.08 4.1 4.1 0 0 0 3.83 2.85A8.23 8.23 0 0 1 2 18.43a11.67 11.67 0 0 0 6.28 1.83"
-      />
+      <circle cx="11" cy="11" r="8" />
+      <path d="M21 21l-4.35-4.35" />
     </svg>
   );
 }
